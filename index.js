@@ -7,8 +7,6 @@ const app = express();
 
 app.use('/', indexRouter);
 
-// scheduler.x();
-
 /**
  * Run cron job to fetch data from Modbus live feed.
  */
