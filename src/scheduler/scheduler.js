@@ -2,20 +2,7 @@ var cron = require('node-cron');
 var fs = require('fs');
 var registerTable = require('../util/registerTable');
 var config = require('../config/config');
-
-const FILE_NAME = 'feed.txt';
-
-// Load data in txt format and convert into array of string.
-
-function loadModubusLiveFeedData() {
-    const rawDataArr = fs
-        .readFileSync(FILE_NAME, 'utf-8')
-        .toString()
-        .replace(/\r\n/g, '\n')
-        .split('\n');
-    
-    convertRawDataIntoJson(rawDataArr);
-}
+var loadModbusData = require('../service/service');
 
 // Parse Raw txt data and covert into JSON format.
 
@@ -60,7 +47,7 @@ function saveJsonFile(registerJsonData) {
 }
 
 let task = cron.schedule('* */1 * * * *', () => {
-    loadModubusLiveFeedData();
+    loadModbusData();
     console.log('running a task every two minutes');
 });
   
