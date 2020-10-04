@@ -46,12 +46,11 @@ function convertRawDataIntoJson(rawDataArr) {
     
     var finalRegisterDataArr = {"data": cookedRegisterArr, "date": processedDataArr[0]};
     var registerJsonData = JSON.stringify(finalRegisterDataArr);
-    console.log(JSON.stringify(registerJsonData));
     saveJsonFile(registerJsonData);
 }
 
 function saveJsonFile(registerJsonData) {
-    fs.writeFile(__dirname + config.jsonFileName, registerJsonData, 'utf-8', function (err) {
+    fs.writeFile(__dirname + config.jsonFile, registerJsonData, 'utf-8', function (err) {
         if (err) {
             console.log("failed to save")
         } else {
@@ -66,4 +65,3 @@ let task = cron.schedule('* */1 * * * *', () => {
 });
   
 module.exports = task;
-// module.exports = x;
