@@ -3,7 +3,7 @@ var loadModbusData = require('../service/service');
 
 // Cron job set to time interval of 2 min
 
-let task = cron.schedule('*/5 * * * * *', () => {
+let task = cron.schedule('* 2 * * * *', () => {
     loadModbusData();
     console.log('running a task every two minutes');
 });

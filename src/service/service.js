@@ -57,7 +57,6 @@ function convertRawDataIntoJson(rawDataArr) {
         "data": cookedRegisterArr 
         };
     var registerJsonData = JSON.stringify(finalRegisterDataArr);
-    console.log(registerJsonData);
     saveJsonFile(registerJsonData);
 }
 
