@@ -2,6 +2,7 @@ var http = require('http');
 var config = require('../config/config');
 var fs = require('fs');
 var registerTable = require('../util/registerTable');
+var { getRealValueForSignalQuality, getRealValueForTwoRegister } = require('../service/converter');
 
 // Load data in txt format and convert into array of string.
 
@@ -28,18 +29,36 @@ function convertRawDataIntoJson(rawDataArr) {
     var cookedRegisterArr = [];
     let processedDataArr = rawDataArr.filter((x,i) => {return (i > 0) && x.length > 0}).map((value, index) => value.split(':'));
     
+    var redableRegisterValue = "";
+
     var i = 0;
     do {
+        redableRegisterValue = "";
         let registerNumber = processedDataArr[i][0];
         if (typeof registerTable[registerNumber] !== 'undefined') {
             if (registerTable[registerNumber]["number"] == 1) {
-                cookedRegisterArr.push({"register": `${processedDataArr[i][0]}`, "regiter_value": `${processedDataArr[i][1]}`, "unit": registerTable[registerNumber]["unit"], "variable_name": registerTable[registerNumber]["varName"]});
+                let registerNumber = processedDataArr[i][0];
+                // Handled conversion logic only for signal quality.
+                // TODO: Handle for other registers and data types.
+                if (registerNumber == 92) {
+                    let registerValue = processedDataArr[i][1];
+                    redableRegisterValue = getRealValueForSignalQuality(registerValue);
+                }
+                cookedRegisterArr.push({"register": `${processedDataArr[i][0]}`, "regiter_value": `${processedDataArr[i][1]}`, "unit": registerTable[registerNumber]["unit"], "variable_name": registerTable[registerNumber]["varName"], "real_value": redableRegisterValue});
                 i += 1;
             } else if (registerTable[registerNumber]["number"] == 2) {
-                cookedRegisterArr.push({"register": `${processedDataArr[i][0]}-${processedDataArr[i+1][0]}`, "regiter_value": `${processedDataArr[i][1]}-${processedDataArr[i+1][1]}`, "unit": registerTable[registerNumber]["unit"], "variable_name": registerTable[registerNumber]["varName"]});
+                let format = registerTable[registerNumber]["format"];
+                // Handled conversion login only for LONG format.
+                // TODO: Handle for all other data format.
+                if (format == "LONG") {
+                    let registerValue1 = processedDataArr[i][1];
+                    let registerValue2 = processedDataArr[i+1][1];
+                    redableRegisterValue = getRealValueForTwoRegister(registerValue1, registerValue2);
+                }
+                cookedRegisterArr.push({"register": `${processedDataArr[i][0]}-${processedDataArr[i+1][0]}`, "regiter_value": `${processedDataArr[i][1]}-${processedDataArr[i+1][1]}`, "unit": registerTable[registerNumber]["unit"], "variable_name": registerTable[registerNumber]["varName"], "real_value": redableRegisterValue});
                 i += 2;
             } else if (registerTable[registerNumber]["number"] == 3) {
-                cookedRegisterArr.push({"register": `${processedDataArr[i][0]}-${processedDataArr[i+1][0]}-${processedDataArr[i+2][0]}`, "regiter_value": `${processedDataArr[i][1]}-${processedDataArr[i+1][1]}-${processedDataArr[i+2][1]}`, "variable_name": registerTable[registerNumber]["unit"], "name": registerTable[registerNumber]["varName"]});
+                cookedRegisterArr.push({"register": `${processedDataArr[i][0]}-${processedDataArr[i+1][0]}-${processedDataArr[i+2][0]}`, "regiter_value": `${processedDataArr[i][1]}-${processedDataArr[i+1][1]}-${processedDataArr[i+2][1]}`, "variable_name": registerTable[registerNumber]["unit"], "name": registerTable[registerNumber]["varName"], "real_value": redableRegisterValue});
                 i += 3;
             }
         } else {
@@ -60,6 +79,8 @@ function convertRawDataIntoJson(rawDataArr) {
     saveJsonFile(registerJsonData);
 }
 
+// Save json file to persistence folder used for response to the client
+
 function saveJsonFile(registerJsonData) {
     fs.writeFile(__dirname + config.jsonFile, registerJsonData, 'utf-8', function (err) {
         if (err) {
@@ -69,5 +90,6 @@ function saveJsonFile(registerJsonData) {
         }
     });
 }
+
 
 module.exports = loadModbusData;
