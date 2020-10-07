@@ -97,7 +97,7 @@ function getNewRegister(processedDataArr, registerId, registerNumber, index) {
         "register_value": registerValue, 
         "unit": registerTable[registerId]["unit"], 
         "variable_name": registerTable[registerId]["varName"], 
-        "real_value": redableRegisterValue};
+        "real_value": redableRegisterValue.toString()};
 }
 
 // Save json file to persistence folder used for response to the client
