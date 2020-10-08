@@ -4,7 +4,7 @@ var fs = require('fs');
 var registerTable = require('../util/registerTable');
 var { getRealValueForSignalQuality, getRealValueForTwoRegister } = require('../service/converter');
 
-// Load data in txt format and convert into array of string.
+// Get data in txt format and convert into array of string.
 
 const loadModbusData = function() { 
     http.get(config.modbusUrl, function(res){
@@ -15,7 +15,10 @@ const loadModbusData = function() {
                str += chunk;
          });
 
+         // Parse data
         res.on('end', function () {
+
+            // splits the txt data based on new line character and store in a array.
             const rawDataArr = str.split('\n');
             convertRawDataIntoJson(rawDataArr);
         });
@@ -26,19 +29,31 @@ const loadModbusData = function() {
 
 function convertRawDataIntoJson(rawDataArr) {
     var cookedRegisterArr = [];
-    let processedDataArr = rawDataArr.filter((x,i) => {return (i > 0) && x.length > 0}).map((value, index) => value.split(':'));
     
+    // split each data in array based on semiccolon ":"
+    let processedDataArr = rawDataArr.filter((x,i) => {return (i > 0) && x.length > 0}).map((value, index) => value.split(':'));
     var index = 0;
+
+    // Prepare coocked data, loop through all splitted data.
     do {
+        // Scan through all process data
         let registerId = processedDataArr[index][0];
         if (typeof registerTable[registerId] !== 'undefined') { 
+
+            // get number of register from register table
             let registerNumber = registerTable[registerId]["number"];
+
+            // if only 1 register required based on Modbus table. For example, register 56 use 1 register
             if (registerNumber == 1) {
                 cookedRegisterArr.push(getNewRegister(processedDataArr,registerId, registerNumber, index));
                 index += 1;
+
+            // if combination of 2 registers required. For example, register 1-2
             } else if (registerNumber == 2) {
                 cookedRegisterArr.push(getNewRegister(processedDataArr, registerId, registerNumber, index));
                 index += 2;
+
+            // if combination of 3 registers required. For example, register 53-54
             } else if (registerNumber == 3) {
                 cookedRegisterArr.push(getNewRegister(processedDataArr, registerId, registerNumber, index));
                 index += 3;
@@ -57,6 +72,8 @@ function convertRawDataIntoJson(rawDataArr) {
         "data": cookedRegisterArr 
         };
     var registerJsonData = JSON.stringify(finalRegisterDataArr);
+
+    // save json on disk
     saveJsonFile(registerJsonData);
 }
 
