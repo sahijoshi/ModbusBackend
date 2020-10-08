@@ -3,7 +3,8 @@ Node.js backend for handling Modbus txt data.
 
 # The Need
  
-This is a backend repository created for providing Modbus data to the frontend client in JSON format. The backend is created in Node.js. The purpose of this repository is to get [Modbus live feed](http://tuftuf.gambitlabs.fi/feed.txt) data which is in txt format. Node.js backend does needful heavy operations on raw txt like parsing data, converting it into standard JSON format as per required by the frontend client app, and saving it. The backend has been hosted on [heroku](http://heroku.com/). Here, a cron-job has been set up which retrieves raw data from Modbus at a certain interval of time, parses the raw txt data, and saves it on disk in json format (in real world, it's better to save data in database). So, the client app does not have to do any heavy processing of the data. The client app can justs get a lightweight json data, parse it and display it.
+This is a backend repository created for providing Modbus data to the frontend client in JSON format. The backend is created in Node.js. The purpose of this repository is to get Modbus live feed data which is in txt format. Node.js backend does needful heavy operations on raw txt like parsing data, converting it into standard JSON format as per required by the frontend client app, and saving it. The backend has been hosted on Heroku. Here, a cron-job has been set up which retrieves raw data from Modbus at a certain interval of time, parses the raw txt data, and saves it on disk in JSON format (in the real world, it's better to save data in database). So, the client app does not have to do any heavy processing of the data. The client app can just get a lightweight JSON data, parse it, and display it.
+
 
 # Technology Used
 - Programming Language: JavaScript
@@ -15,8 +16,8 @@ This is a backend repository created for providing Modbus data to the frontend c
 - Node Package Manager (npm)
 
 # Installation
-- Download from repository.
-- Make sure node.js and npm is installed.
+- Download from the repository.
+- Make sure node.js and npm are installed.
 - Browse inside the project folder in the terminal and run “npm install” command. This installs required dependencies.
 - To run the project, run “node index.js"
 
@@ -27,7 +28,7 @@ The Modbus JSON data can be accessed with GET request.
 - Hosted on Heroku: https://modbus-prod.herokuapp.com/modbus
 
 #### Example
-- JSON Response: The API returns JSON response with http GET request which is as follows:
+- JSON Response: The API returns JSON response with HTTP GET request which is as follows:
 ```bash
 {
     "date": "2018-08-03 04:06",
@@ -67,11 +68,11 @@ The Modbus JSON data can be accessed with GET request.
 ### High Level Algorithm
 - Get data from Modbus live feed data in txt format at certain interval of time using cron-job
 - Parse txt data.
-- Save the retrieved data on disk in json format.
-- When frontend requests data, send cooked data as json response.
+- Save the retrieved data on disk in JSON format.
+- When frontend requests data, send cooked data as JSON response.
 
 #### Cron-job
-- A cron-job has been setup which runs at specific interval of time. The cron-job interval can be setup depending upon how frequent Modbus data is available.
+- A cron-job has been set up which runs at a specific interval of time. The cron-job interval can be setup depending upon how frequent Modbus data is available.
 
 #### Code
 ```bash
@@ -86,7 +87,7 @@ let task = cron.schedule('* 2 * * * *', () => {
 - Node.js request Modbuse data through url "http://tuftuf.gambitlabs.fi/feed.txt". service.js -> loadModbusData function is responsible for this task.
 
 ### Parse txt data
-1)  Download raw txt data and split the contents based on "\n" new line character into array.
+1)  Download raw txt data and split the contents based on "\n" newline character into an array.
 
 #### Code Parse
  ```bash
@@ -122,8 +123,8 @@ const loadModbusData = function() {
 ]
 ```
 #### Code Parse Continue...
-2) The data in first index is "date" which can be extracted easily by accessing first index data in an array.
-3) For remaining data split each data based on semicolon ":"
+2) The data in the first index is "date" which can be extracted easily by accessing first index data in an array.
+3) For the remaining data split each data based on semicolon ":"
 ```bash
     let processedDataArr = rawDataArr.filter((x,i) => {return (i > 0) && x.length > 0}).map((value, index) => value.split(':'));
 ```
@@ -136,7 +137,7 @@ const loadModbusData = function() {
 Here first index is register number, last is the register value.
 ```
 #### Code Parse Continue...
-4) Based on Modbus register documentation [docs/tuf-2000m.pdf](https://github.com/gambit-labs/challenge/blob/master/docs/tuf-2000m.pdf). I have mapped "Modbus Register Table" into JavaScript Objects so that I can get required value based on register number. It's maintained in registerTable.js as follows:
+4) Based on Modbus register documentation [docs/tuf-2000m.pdf](https://github.com/gambit-labs/challenge/blob/master/docs/tuf-2000m.pdf). I have mapped "Modbus Register Table" into JavaScript Objects so that I can get the required value based on the register number. It's maintained in registerTable.js as follows:
 ```bash
 const registerTable = {
     "1": {
@@ -161,7 +162,7 @@ const registerTable = {
         "realValue": ""
     }, ... more items
 ```
-5) Loop through all splitted data and prepare coocked final json data as shown below in code.
+5) Loop through all split data and prepare cooked final JSON data as shown below in code.
 #### Code Parse Continue...
 ```bash
 // Parse Raw txt data and covert into JSON format.
@@ -294,7 +295,7 @@ function getNewRegister(processedDataArr, registerId, registerNumber, index) {
  }
 ```
 # Conversion to Human Readabale
-I have tried to convert current register value to human readable value which has been done for "LONG" Data Format and Signal Quality -> register number 92, Integer. For REAL4 and other tried but no success, need more research. The conversion logic is implemented on converter.js.
+I have tried to convert the current register value to human-readable value which has been done for "LONG" Data Format and Signal Quality -> register number 92, Integer. For REAL4 and others tried but no success, need more research. The conversion logic is implemented on converter.js.
 
 ## Logic for Conversion
 #### LONG Format Logic
@@ -327,7 +328,7 @@ const getRealValueForTwoRegister = (reg1, reg2) => {
 };
 ```
 ## Signal Quality Conversion
-- Convert register value to 16 bit binary.
+- Convert register value to 16-bit binary.
 - Convert low byte of binary into decimal.
 #### Code
 ```bash
@@ -343,6 +344,15 @@ const getRealValueForSignalQuality = (reg) => {
 };
 ```
 # Deployment
-- The backend has been deployed and hosted on Heroku. Its a PaaS service supports different programming language.
+- The backend has been deployed and hosted on Heroku. Its a PaaS service supports different programming languages.
+- A pipeline has been maintained on Heroku for staging and production deployment as shown in the screenshot.
+- The final product is deployed in the production environment.
+#### Heroku
+<img src="https://raw.githubusercontent.com/sahijoshi/ModbusBackend/master/Assets/heroku.png" width="600"/>
+#### Postman
+<img src="https://raw.githubusercontent.com/sahijoshi/ModbusBackend/master/Assets/postman.png" width="600"/>
+
+# Author
+Sahi Joshi, Email: sahik.joshi@gmail.com
 
 
