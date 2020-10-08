@@ -247,6 +247,14 @@ function getNewRegister(processedDataArr, registerId, registerNumber, index) {
             redableRegisterValue = getRealValueForTwoRegister(registerValue1, registerValue2);
         }
     } 
+
+    return {
+        "register": register, 
+        "register_value": registerValue, 
+        "unit": registerTable[registerId]["unit"], 
+        "variable_name": registerTable[registerId]["varName"], 
+        "real_value": redableRegisterValue.toString()};
+}
 ```
 #### Final JSON Output
 ```bash
