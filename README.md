@@ -349,6 +349,7 @@ const getRealValueForSignalQuality = (reg) => {
 - The final product is deployed in the production environment.
 #### Heroku
 <img src="https://raw.githubusercontent.com/sahijoshi/ModbusBackend/master/Assets/heroku.png" width="600"/>
+
 #### Postman
 <img src="https://raw.githubusercontent.com/sahijoshi/ModbusBackend/master/Assets/postman.png" width="600"/>
 
@@ -357,6 +358,8 @@ Sahi Joshi, Email: sahik.joshi@gmail.com
 
 # References
 https://stackoverflow.com/questions/37022434/how-do-i-parse-a-twos-complement-string-to-a-number
+
 https://stackoverflow.com/questions/21931789/convert-binary-twos-complement-data-into-integer-in-objective-c
+
 https://www.rapidtables.com/convert/number/binary-to-decimal.html
 
